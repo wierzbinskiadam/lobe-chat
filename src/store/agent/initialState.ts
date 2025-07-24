@@ -1,7 +1,7 @@
-import { AgentState, initialSessionState } from './slices/chat/initialState';
+import { AgentState, initialAgentChatState } from './slices/chat/initialState';
 
-export type SessionStoreState = AgentState;
+export type AgentStoreState = AgentState;
 
-export const initialState: SessionStoreState = {
-  ...initialSessionState,
+export const initialState: AgentStoreState = {
+  ...initialAgentChatState,
 };

@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext } from 'zustand-utils';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
@@ -12,3 +14,5 @@ export type { State } from './initialState';
 export const createStore = () => createWithEqualityFn(subscribeWithSelector(store), shallow);
 
 export const { useStore, useStoreApi, Provider } = createContext<StoreApiWithSelector<Store>>();
+
+export { selectors } from './selectors';

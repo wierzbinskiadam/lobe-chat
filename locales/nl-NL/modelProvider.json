@@ -1,26 +1,9 @@
 {
-  "anthropic": {
-    "endpoint": {
-      "desc": "Naast het standaardadres moet http(s):// worden opgenomen",
-      "placeholder": "https://api.anthropic.com",
-      "title": "API Proxy Adres"
-    },
-    "title": "Anthropic",
-    "token": {
-      "desc": "Voer de API Key van Anthropic in",
-      "placeholder": "Anthropic API Key",
-      "title": "API Key"
-    },
-    "unlock": {
-      "description": "Voer uw Anthropic API-sleutel in om een sessie te starten. De app zal uw API-sleutel niet opslaan",
-      "title": "Gebruik aangepaste Anthropic API-sleutel"
-    }
-  },
   "azure": {
     "azureApiVersion": {
       "desc": "De API-versie van Azure, volgt het formaat YYYY-MM-DD, raadpleeg [de nieuwste versie](https://learn.microsoft.com/nl-nl/azure/ai-services/openai/reference#chat-completions)",
       "fetch": "Lijst ophalen",
-      "title": "Azure Api Versie"
+      "title": "Azure API Versie"
     },
     "empty": "Voer een model-ID in om het eerste model toe te voegen",
     "endpoint": {
@@ -34,10 +17,24 @@
       "desc": "Dit waarde kan gevonden worden in de 'Sleutels en eindpunt' sectie wanneer je een bron in Azure Portal controleert. Je kunt KEY1 of KEY2 gebruiken",
       "placeholder": "Azure API Key",
       "title": "API Key"
+    }
+  },
+  "azureai": {
+    "azureApiVersion": {
+      "desc": "De API-versie van Azure, volgens het formaat YYYY-MM-DD. Raadpleeg de [laatste versie](https://learn.microsoft.com/zh-cn/azure/ai-services/openai/reference#chat-completions)",
+      "fetch": "Lijst ophalen",
+      "title": "Azure API-versie"
     },
-    "unlock": {
-      "description": "Voer uw Azure OpenAI API-sleutel in om een sessie te starten",
-      "title": "Gebruik aangepaste Azure OpenAI API-sleutel"
+    "endpoint": {
+      "desc": "Vind het Azure AI-model inferentie-eindpunt in het overzicht van het Azure AI-project",
+      "placeholder": "https://ai-userxxxxxxxxxx.services.ai.azure.com/models",
+      "title": "Azure AI-eindpunt"
+    },
+    "title": "Azure OpenAI",
+    "token": {
+      "desc": "Vind de API-sleutel in het overzicht van het Azure AI-project",
+      "placeholder": "Azure-sleutel",
+      "title": "Sleutel"
     }
   },
   "bedrock": {
@@ -59,197 +56,292 @@
       "placeholder": "AWS Secret Access Key",
       "title": "AWS Secret Access Key"
     },
+    "sessionToken": {
+      "desc": "Als je AWS SSO/STS gebruikt, voer dan je AWS Sessie Token in",
+      "placeholder": "AWS Sessie Token",
+      "title": "AWS Sessie Token (optioneel)"
+    },
     "title": "Bedrock",
     "unlock": {
       "customRegion": "Aangepaste regio",
+      "customSessionToken": "Aangepaste sessietoken",
       "description": "Voer uw AWS AccessKeyId / SecretAccessKey in om een sessie te starten. De app zal uw verificatiegegevens niet opslaan",
+      "imageGenerationDescription": "Voer je AWS AccessKeyId / SecretAccessKey in om te beginnen met genereren. De applicatie slaat je authenticatiegegevens niet op",
       "title": "Gebruik aangepaste Bedrock-verificatiegegevens"
     }
   },
-  "google": {
-    "endpoint": {
-      "desc": "除默认地址外，必须包含 http(s)://",
-      "placeholder": "https://generativelanguage.googleapis.com",
-      "title": "API 代理地址"
+  "cloudflare": {
+    "apiKey": {
+      "desc": "Voer Cloudflare API Key in",
+      "placeholder": "Cloudflare API Key",
+      "title": "Cloudflare API Key"
     },
-    "title": "Google",
-    "token": {
-      "desc": "Voer de API Key van Google in",
-      "placeholder": "Google API Key",
-      "title": "API Key"
-    },
-    "unlock": {
-      "description": "Voer uw Google API-sleutel in om een sessie te starten. De app zal uw API-sleutel niet opslaan",
-      "title": "Gebruik aangepaste Google API-sleutel"
+    "baseURLOrAccountID": {
+      "desc": "Voer uw Cloudflare-account ID of een custom API-URL in",
+      "placeholder": "Cloudflare-account ID / custom API-URL",
+      "title": "Cloudflare-account ID / API-URL"
     }
   },
-  "groq": {
-    "title": "Groq",
-    "token": {
-      "desc": "Voer de API Key van Groq in",
-      "placeholder": "Groq API Key",
-      "title": "API Key"
+  "createNewAiProvider": {
+    "apiKey": {
+      "placeholder": "Vul je API-sleutel in",
+      "title": "API-sleutel"
     },
-    "unlock": {
-      "description": "Voer uw Groq API-sleutel in om een sessie te starten. De app zal uw API-sleutel niet opslaan",
-      "title": "Gebruik aangepaste Groq API-sleutel"
+    "basicTitle": "Basisinformatie",
+    "configTitle": "Configuratie-informatie",
+    "confirm": "Nieuw aanmaken",
+    "createSuccess": "Succesvol aangemaakt",
+    "description": {
+      "placeholder": "Beschrijving van de provider (optioneel)",
+      "title": "Beschrijving van de provider"
+    },
+    "id": {
+      "desc": "Een unieke identificatie voor de dienstverlener, kan na creatie niet meer worden gewijzigd",
+      "format": "Mag alleen cijfers, kleine letters, koppeltekens (-) en onderstrepingstekens (_) bevatten",
+      "placeholder": "Gebruik alleen kleine letters, bijvoorbeeld openai, kan niet worden gewijzigd na aanmaak",
+      "required": "Vul de provider ID in",
+      "title": "Provider ID"
+    },
+    "logo": {
+      "required": "Upload een correcte provider-logo",
+      "title": "Provider-logo"
+    },
+    "name": {
+      "placeholder": "Voer de weergavenaam van de provider in",
+      "required": "Vul de naam van de provider in",
+      "title": "Naam van de provider"
+    },
+    "proxyUrl": {
+      "required": "Vul het proxyadres in",
+      "title": "Proxy-adres"
+    },
+    "sdkType": {
+      "placeholder": "openai/anthropic/azureai/ollama/...",
+      "required": "Selecteer het SDK-type",
+      "title": "Aanvraagformaat"
+    },
+    "title": "Maak een aangepaste AI-provider"
+  },
+  "github": {
+    "personalAccessToken": {
+      "desc": "Vul je Github PAT in, klik [hier](https://github.com/settings/tokens) om er een te maken",
+      "placeholder": "ghp_xxxxxx",
+      "title": "GitHub PAT"
     }
   },
-  "mistral": {
-    "title": "Mistral AI",
-    "token": {
-      "desc": "Voer de API Key van Mistral AI in",
-      "placeholder": "Mistral AI API Key",
-      "title": "API Key"
-    },
-    "unlock": {
-      "description": "Voer uw Mistral AI API-sleutel in om een sessie te starten. De app zal uw API-sleutel niet opslaan",
-      "title": "Gebruik aangepaste Mistral AI API-sleutel"
+  "huggingface": {
+    "accessToken": {
+      "desc": "Vul je HuggingFace Token in, klik [hier](https://huggingface.co/settings/tokens) om er een te maken",
+      "placeholder": "hf_xxxxxxxxx",
+      "title": "HuggingFace Token"
     }
   },
-  "moonshot": {
-    "title": "De Donkere Kant van de Maan",
-    "token": {
-      "desc": "Voer de API Key van Moonshot AI in",
-      "placeholder": "Moonshot AI API Key",
-      "title": "API Key"
-    },
-    "unlock": {
-      "description": "Voer uw Moonshot AI API-sleutel in om een sessie te starten. De app zal uw API-sleutel niet opslaan",
-      "title": "Gebruik aangepaste Moonshot AI API-sleutel"
+  "list": {
+    "title": {
+      "disabled": "Dienstverlener niet ingeschakeld",
+      "enabled": "Dienstverlener ingeschakeld"
     }
+  },
+  "menu": {
+    "addCustomProvider": "Voeg aangepaste provider toe",
+    "all": "Alles",
+    "list": {
+      "disabled": "Niet ingeschakeld",
+      "enabled": "Ingeschakeld"
+    },
+    "notFound": "Geen zoekresultaten gevonden",
+    "searchProviders": "Zoek providers...",
+    "sort": "Aangepaste sortering"
   },
   "ollama": {
     "checker": {
-      "desc": "Test of het proxyadres correct is ingevuld"
+      "desc": "Test of het proxyadres correct is ingevuld",
+      "title": "Connectiviteitscontrole"
     },
     "customModelName": {
       "desc": "Voeg aangepaste modellen toe, gebruik een komma (,) om meerdere modellen te scheiden",
       "placeholder": "vicuna,llava,codellama,llama2:13b-text",
       "title": "Aangepaste Modelnamen"
     },
+    "download": {
+      "desc": "Ollama is het model aan het downloaden, sluit deze pagina alstublieft niet af. Bij een herstart zal het downloaden op de onderbroken plaats verdergaan.",
+      "failed": "Het downloaden van het model is mislukt. Controleer uw netwerk of de Ollama-instellingen en probeer het opnieuw.",
+      "remainingTime": "Overgebleven tijd",
+      "speed": "Downloadsnelheid",
+      "title": "Model {{model}} wordt gedownload"
+    },
     "endpoint": {
-      "desc": "Voer het Ollama interface proxyadres in, laat leeg indien niet specifiek aangegeven",
-      "placeholder": "http://127.0.0.1:11434",
+      "desc": "Moet http(s):// bevatten, kan leeg gelaten worden als lokaal niet specifiek opgegeven",
       "title": "Interface Proxyadres"
     },
-    "setup": {
-      "cors": {
-        "description": "Due to browser security restrictions, you need to configure cross-origin settings for Ollama to function properly.",
-        "linux": {
-          "env": "Add `Environment` under [Service] section, and set the OLLAMA_ORIGINS environment variable:",
-          "reboot": "Reload systemd and restart Ollama.",
-          "systemd": "Invoke systemd to edit the ollama service:"
-        },
-        "macos": "Open the 'Terminal' application, paste the following command, and press Enter to run it.",
-        "reboot": "Please restart the Ollama service after the execution is complete.",
-        "title": "Configure Ollama for Cross-Origin Access",
-        "windows": "On Windows, go to 'Control Panel' and edit system environment variables. Create a new environment variable named 'OLLAMA_ORIGINS' for your user account, set the value to '*', and click 'OK/Apply' to save."
+    "title": "Ollama",
+    "unlock": {
+      "cancel": "Annuleer download",
+      "confirm": "Downloaden",
+      "description": "Voer je Ollama model label in om door te gaan met de sessie",
+      "downloaded": "{{completed}} / {{total}}",
+      "starting": "Downloaden starten...",
+      "title": "Download het opgegeven Ollama model"
+    }
+  },
+  "providerModels": {
+    "config": {
+      "aesGcm": "Je sleutel en proxy-adres worden versleuteld met <1>AES-GCM</1> encryptie-algoritme",
+      "apiKey": {
+        "desc": "Vul je {{name}} API-sleutel in",
+        "placeholder": "{{name}} API-sleutel",
+        "title": "API-sleutel"
       },
-      "install": {
-        "description": "Zorg ervoor dat Ollama is ingeschakeld. Als je Ollama nog niet hebt gedownload, ga dan naar de officiële website om <1>te downloaden</1>.",
-        "docker": "If you prefer using Docker, Ollama also provides official Docker images. You can pull them using the following command:",
-        "linux": {
-          "command": "Install using the following command:",
-          "manual": "Alternatively, you can refer to the <1>Linux Manual Installation Guide</1> for manual installation."
+      "baseURL": {
+        "desc": "Moet http(s):// bevatten",
+        "invalid": "Voer een geldige URL in",
+        "placeholder": "https://your-proxy-url.com/v1",
+        "title": "API-proxy-adres"
+      },
+      "checker": {
+        "button": "Controleer",
+        "desc": "Test of de API-sleutel en proxy-adres correct zijn ingevuld",
+        "pass": "Controle geslaagd",
+        "title": "Connectiviteitstest"
+      },
+      "fetchOnClient": {
+        "desc": "Clientaanvraagmodus zal sessieaanvragen rechtstreeks vanuit de browser initiëren, wat de responssnelheid kan verbeteren",
+        "title": "Gebruik clientaanvraagmodus"
+      },
+      "helpDoc": "Configuratiehandleiding",
+      "responsesApi": {
+        "desc": "Gebruik de nieuwe generatie OpenAI-aanvraagformaatstandaard om geavanceerde functies zoals keten van gedachten te ontgrendelen",
+        "title": "Gebruik Responses API-standaard"
+      },
+      "waitingForMore": "Meer modellen zijn in <1>planning voor integratie</1>, blijf op de hoogte"
+    },
+    "createNew": {
+      "title": "Maak een aangepast AI-model"
+    },
+    "item": {
+      "config": "Configureer model",
+      "customModelCards": {
+        "addNew": "Maak en voeg {{id}} model toe",
+        "confirmDelete": "Je staat op het punt dit aangepaste model te verwijderen, na verwijdering kan het niet worden hersteld, wees voorzichtig."
+      },
+      "delete": {
+        "confirm": "Bevestig verwijdering van model {{displayName}}?",
+        "success": "Verwijdering geslaagd",
+        "title": "Verwijder model"
+      },
+      "modelConfig": {
+        "azureDeployName": {
+          "extra": "Het veld dat daadwerkelijk wordt aangevraagd in Azure OpenAI",
+          "placeholder": "Voer de modelimplementatienaam in Azure in",
+          "title": "Modelimplementatienaam"
         },
-        "title": "Install and Start Ollama Locally",
-        "windowsTab": "Windows (Preview)"
-      }
+        "deployName": {
+          "extra": "Dit veld wordt als model-ID verzonden bij het indienen van een verzoek",
+          "placeholder": "Voer de naam of ID van het daadwerkelijk gedeployde model in",
+          "title": "Modeldeploynaam"
+        },
+        "displayName": {
+          "placeholder": "Voer de weergavenaam van het model in, bijvoorbeeld ChatGPT, GPT-4, enz.",
+          "title": "Weergavenaam van het model"
+        },
+        "files": {
+          "extra": "De huidige bestandsuploadimplementatie is slechts een hackoplossing, alleen voor eigen gebruik. Volledige bestandsuploadcapaciteit komt later beschikbaar.",
+          "title": "Ondersteuning voor bestandsupload"
+        },
+        "functionCall": {
+          "extra": "Deze configuratie schakelt alleen de mogelijkheid in voor het model om tools te gebruiken, waardoor het mogelijk is om plug-ins voor tools aan het model toe te voegen. Of het model daadwerkelijk tools kan gebruiken, hangt echter volledig af van het model zelf; test de bruikbaarheid zelf.",
+          "title": "Ondersteuning voor het gebruik van tools"
+        },
+        "id": {
+          "extra": "Kan niet worden gewijzigd na creatie, wordt gebruikt als model-id bij het aanroepen van AI",
+          "placeholder": "Voer model-id in, bijvoorbeeld gpt-4o of claude-3.5-sonnet",
+          "title": "Model ID"
+        },
+        "modalTitle": "Configuratie van aangepast model",
+        "reasoning": {
+          "extra": "Deze configuratie schakelt alleen de mogelijkheid voor diepgaand denken van het model in. Het specifieke effect hangt volledig af van het model zelf, test zelf of dit model in staat is tot bruikbaar diepgaand denken.",
+          "title": "Ondersteuning voor diepgaand denken"
+        },
+        "tokens": {
+          "extra": "Stel het maximale aantal tokens in dat door het model wordt ondersteund",
+          "title": "Maximale contextvenster",
+          "unlimited": "Onbeperkt"
+        },
+        "vision": {
+          "extra": "Deze configuratie zal alleen de afbeeldinguploadcapaciteit in de applicatie inschakelen, of herkenning wordt ondersteund hangt volledig af van het model zelf, test de beschikbaarheid van de visuele herkenningscapaciteit van dit model zelf.",
+          "title": "Ondersteuning voor visuele herkenning"
+        }
+      },
+      "pricing": {
+        "image": "${{amount}}/Afbeelding",
+        "inputCharts": "${{amount}}/M Tekens",
+        "inputMinutes": "${{amount}}/Minuten",
+        "inputTokens": "Invoer ${{amount}}/M",
+        "outputTokens": "Uitvoer ${{amount}}/M"
+      },
+      "releasedAt": "Uitgebracht op {{releasedAt}}"
     },
-    "title": "Ollama"
+    "list": {
+      "addNew": "Model toevoegen",
+      "disabled": "Niet ingeschakeld",
+      "disabledActions": {
+        "showMore": "Toon alles"
+      },
+      "empty": {
+        "desc": "Maak een aangepast model of haal een model op om te beginnen met gebruiken.",
+        "title": "Geen beschikbare modellen"
+      },
+      "enabled": "Ingeschakeld",
+      "enabledActions": {
+        "disableAll": "Alle uitschakelen",
+        "enableAll": "Alle inschakelen",
+        "sort": "Aangepaste model sortering"
+      },
+      "enabledEmpty": "Geen ingeschakelde modellen, schakel de modellen hieronder in die je leuk vindt~",
+      "fetcher": {
+        "clear": "Verwijder de opgehaalde modellen",
+        "fetch": "Haal modellenlijst op",
+        "fetching": "Bezig met het ophalen van de modellenlijst...",
+        "latestTime": "Laatste update tijd: {{time}}",
+        "noLatestTime": "Lijst nog niet opgehaald"
+      },
+      "resetAll": {
+        "conform": "Weet je zeker dat je alle wijzigingen van het huidige model wilt resetten? Na de reset zal de huidige modellenlijst terugkeren naar de standaardstatus",
+        "success": "Resetten geslaagd",
+        "title": "Reset alle wijzigingen"
+      },
+      "search": "Zoek modellen...",
+      "searchResult": "Gevonden {{count}} modellen",
+      "title": "Modellenlijst",
+      "total": "In totaal {{count}} modellen beschikbaar"
+    },
+    "searchNotFound": "Geen zoekresultaten gevonden"
   },
-  "openai": {
-    "endpoint": {
-      "desc": "Naast het standaardadres moet http(s):// worden opgenomen",
-      "placeholder": "https://api.openai.com/v1",
-      "title": "Interface Proxyadres"
-    },
-    "title": "OpenAI",
-    "token": {
-      "desc": "Gebruik je eigen OpenAI Key",
-      "placeholder": "OpenAI API Key",
-      "title": "OpenAI API Key"
-    },
-    "unlock": {
-      "description": "Voer uw OpenAI API-sleutel in om een sessie te starten. De app zal uw API-sleutel niet opslaan",
-      "title": "Gebruik aangepaste OpenAI API-sleutel"
-    }
+  "sortModal": {
+    "success": "Sortering succesvol bijgewerkt",
+    "title": "Aangepaste sortering",
+    "update": "Bijwerken"
   },
-  "openrouter": {
-    "checker": {
-      "desc": "Test of het proxyadres correct is ingevuld"
-    },
-    "customModelName": {
-      "desc": "Voeg aangepaste modellen toe, gebruik een komma (,) om meerdere modellen te scheiden",
-      "placeholder": "mistralai/mistral-7b-instruct:free,openchat/openchat-7b:free",
-      "title": "Aangepaste Modelnamen"
-    },
-    "title": "OpenRouter",
-    "token": {
-      "desc": "Voer de API Key van OpenRouter AI in",
-      "placeholder": "OpenRouter AI API Key",
-      "title": "API Key"
-    },
-    "unlock": {
-      "description": "Voer uw OpenRouter API-sleutel in om een sessie te starten. De app zal uw API-sleutel niet opslaan",
-      "title": "Gebruik aangepaste OpenRouter API-sleutel"
-    }
+  "updateAiProvider": {
+    "confirmDelete": "Je staat op het punt deze AI-provider te verwijderen, na verwijdering kan deze niet worden hersteld, bevestig je verwijdering?",
+    "deleteSuccess": "Verwijdering geslaagd",
+    "tooltip": "Werk basisconfiguratie van provider bij",
+    "updateSuccess": "Bijwerking geslaagd"
   },
-  "perplexity": {
-    "title": "Perplexity",
-    "token": {
-      "desc": "Voer de API Key van Perplexity AI in",
-      "placeholder": "Perplexity AI API Key",
-      "title": "API Key"
-    },
-    "unlock": {
-      "description": "Voer uw Perplexity API-sleutel in om een sessie te starten. De app zal uw API-sleutel niet opslaan",
-      "title": "Gebruik aangepaste Perplexity API-sleutel"
-    }
+  "updateCustomAiProvider": {
+    "title": "Bijwerken van de configuratie van de aangepaste AI-provider"
   },
-  "togetherai": {
-    "checker": {
-      "desc": "Test of het proxyadres correct is ingevuld"
-    },
-    "customModelName": {
-      "desc": "Voeg aangepaste modellen toe, gebruik een komma (,) om meerdere modellen te scheiden",
-      "placeholder": "togethercomputer/Llama-2-7B-32K-Instruct,teknium/OpenHermes-2-Mistral-7B",
-      "title": "Aangepaste Modelnamen"
-    },
-    "title": "TogetherAI",
-    "token": {
-      "desc": "Voer de API Key van TogetherAI AI in",
-      "placeholder": "TogetherAI AI API Key",
-      "title": "API Key"
-    },
-    "unlock": {
-      "description": "Voer uw TogetherAI API-sleutel in om een sessie te starten. De app zal uw API-sleutel niet opslaan",
-      "title": "Gebruik aangepaste TogetherAI API-sleutel"
+  "vertexai": {
+    "apiKey": {
+      "desc": "Vul je Vertex AI-sleutels in",
+      "placeholder": "{ \"type\": \"service_account\", \"project_id\": \"xxx\", \"private_key_id\": ... }",
+      "title": "Vertex AI-sleutels"
     }
   },
   "zeroone": {
-    "title": "01.AI Nul Een Alles",
-    "token": {
-      "desc": "Voer de API Key van 01.AI Nul Een Alles in",
-      "placeholder": "01.AI Nul Een Alles API Key",
-      "title": "API Key"
-    },
-    "unlock": {
-      "description": "Voer uw ZeroOne API-sleutel in om een sessie te starten. De app zal uw API-sleutel niet opslaan",
-      "title": "Gebruik aangepaste ZeroOne API-sleutel"
-    }
+    "title": "01.AI Nul Een Alles"
   },
   "zhipu": {
-    "title": "Intelligent Spectrum",
-    "token": {
-      "desc": "Voer de API Key van Intelligent Spectrum in",
-      "placeholder": "Zhipu API Key",
-      "title": "API Key"
-    },
-    "unlock": {
-      "description": "Voer uw Zhipu API-sleutel in om een sessie te starten. De app zal uw API-sleutel niet opslaan",
-      "title": "Gebruik aangepaste Zhipu API-sleutel"
-    }
+    "title": "Intelligent Spectrum"
   }
 }

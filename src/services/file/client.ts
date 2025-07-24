@@ -1,88 +1,85 @@
-import { FileModel } from '@/database/client/models/file';
-import { DB_File } from '@/database/client/schemas/files';
-import { FilePreview } from '@/types/files';
-import compressImage from '@/utils/compressImage';
+import { clientDB } from '@/database/client/db';
+import { FileModel } from '@/database/models/file';
+import { BaseClientService } from '@/services/baseClientService';
+import { clientS3Storage } from '@/services/file/ClientS3';
 
-import { API_ENDPOINTS } from '../_url';
 import { IFileService } from './type';
 
-export class ClientService implements IFileService {
-  async uploadFile(file: DB_File) {
-    // 跳过图片上传测试
-    const isTestData = file.size === 1;
-    if (this.isImage(file.fileType) && !isTestData) {
-      return this.uploadImageFile(file);
-    }
+export class ClientService extends BaseClientService implements IFileService {
+  private get fileModel(): FileModel {
+    return new FileModel(clientDB as any, this.userId);
+  }
+
+  createFile: IFileService['createFile'] = async (file) => {
+    const { isExist } = await this.fileModel.checkHash(file.hash!);
 
     // save to local storage
     // we may want to save to a remote server later
-    return FileModel.create(file);
-  }
+    const res = await this.fileModel.create(
+      {
+        fileHash: file.hash,
+        fileType: file.fileType,
+        knowledgeBaseId: file.knowledgeBaseId,
+        metadata: file.metadata,
+        name: file.name,
+        size: file.size,
+        url: file.url!,
+      },
+      !isExist,
+    );
 
-  async uploadImageByUrl(url: string, file: Pick<DB_File, 'name' | 'metadata'>) {
-    const res = await fetch(API_ENDPOINTS.proxy, { body: url, method: 'POST' });
-    const data = await res.arrayBuffer();
-    const fileType = res.headers.get('content-type') || 'image/webp';
+    // get file to base64 url
+    const base64 = await this.getBase64ByFileHash(file.hash!);
 
-    return this.uploadFile({
-      data,
-      fileType,
-      metadata: file.metadata,
-      name: file.name,
-      saveMode: 'local',
-      size: data.byteLength,
-    });
-  }
+    return {
+      id: res.id,
+      url: `data:${file.fileType};base64,${base64}`,
+    };
+  };
 
-  async getFile(id: string): Promise<FilePreview> {
-    const item = await FileModel.findById(id);
+  getFile: IFileService['getFile'] = async (id) => {
+    const item = await this.fileModel.findById(id);
     if (!item) {
       throw new Error('file not found');
     }
 
     // arrayBuffer to url
-    const url = URL.createObjectURL(new Blob([item.data], { type: item.fileType }));
-    const base64 = Buffer.from(item.data).toString('base64');
+    const fileItem = await clientS3Storage.getObject(item.fileHash!);
+    if (!fileItem) throw new Error('file not found');
+
+    const url = URL.createObjectURL(fileItem);
 
     return {
-      base64Url: `data:${item.fileType};base64,${base64}`,
-      fileType: item.fileType,
+      createdAt: new Date(item.createdAt),
+      id,
       name: item.name,
-      saveMode: 'local',
+      size: item.size,
+      type: item.fileType,
+      updatedAt: new Date(item.updatedAt),
       url,
     };
-  }
+  };
 
-  async removeFile(id: string) {
-    return FileModel.delete(id);
-  }
+  removeFile: IFileService['removeFile'] = async (id) => {
+    await this.fileModel.delete(id, false);
+  };
 
-  async removeAllFiles() {
-    return FileModel.clear();
-  }
+  removeFiles: IFileService['removeFiles'] = async (ids) => {
+    await this.fileModel.deleteMany(ids, false);
+  };
 
-  private isImage(fileType: string) {
-    const imageRegex = /^image\//;
-    return imageRegex.test(fileType);
-  }
+  removeAllFiles: IFileService['removeAllFiles'] = async () => {
+    return this.fileModel.clear();
+  };
 
-  private async uploadImageFile(file: DB_File) {
-    // 加载图片
-    const url = file.url || URL.createObjectURL(new Blob([file.data]));
+  checkFileHash: IFileService['checkFileHash'] = async (hash) => {
+    return this.fileModel.checkHash(hash);
+  };
 
-    const img = new Image();
-    img.src = url;
-    await (() =>
-      new Promise((resolve) => {
-        img.addEventListener('load', resolve);
-      }))();
+  private getBase64ByFileHash = async (hash: string) => {
+    const fileItem = await clientS3Storage.getObject(hash);
+    if (!fileItem) throw new Error('file not found');
 
-    // 压缩图片
-    const base64String = compressImage({ img, type: file.fileType });
-    const binaryString = atob(base64String.split('base64,')[1]);
-    const uint8Array = Uint8Array.from(binaryString, (char) => char.charCodeAt(0));
-    file.data = uint8Array.buffer;
-
-    return FileModel.create(file);
-  }
+    return Buffer.from(await fileItem.arrayBuffer()).toString('base64');
+  };
 }

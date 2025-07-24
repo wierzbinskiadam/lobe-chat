@@ -1,36 +1,49 @@
-import { DB_Message } from '@/database/client/schemas/message';
-import { ChatMessage, ChatMessageError, ChatPluginPayload } from '@/types/message';
+import type { HeatmapsProps } from '@lobehub/charts';
+
+import {
+  ChatMessage,
+  ChatMessageError,
+  ChatMessagePluginError,
+  ChatTTS,
+  ChatTranslate,
+  CreateMessageParams,
+  MessageItem,
+  ModelRankItem,
+  UpdateMessageParams,
+} from '@/types/message';
 
 /* eslint-disable typescript-sort-keys/interface */
 
-export interface CreateMessageParams
-  extends Partial<Omit<ChatMessage, 'content' | 'role'>>,
-    Pick<ChatMessage, 'content' | 'role'> {
-  fromModel?: string;
-  fromProvider?: string;
-  sessionId: string;
-  traceId?: string;
-}
-
 export interface IMessageService {
   createMessage(data: CreateMessageParams): Promise<string>;
-  batchCreateMessages(messages: ChatMessage[]): Promise<any>;
+  batchCreateMessages(messages: MessageItem[]): Promise<any>;
 
   getMessages(sessionId: string, topicId?: string): Promise<ChatMessage[]>;
   getAllMessages(): Promise<ChatMessage[]>;
   getAllMessagesInSession(sessionId: string): Promise<ChatMessage[]>;
-  countMessages(): Promise<number>;
-
+  countMessages(params?: {
+    endDate?: string;
+    range?: [string, string];
+    startDate?: string;
+  }): Promise<number>;
+  countWords(params?: {
+    endDate?: string;
+    range?: [string, string];
+    startDate?: string;
+  }): Promise<number>;
+  rankModels(): Promise<ModelRankItem[]>;
+  getHeatmaps(): Promise<HeatmapsProps['data']>;
   updateMessageError(id: string, error: ChatMessageError): Promise<any>;
-  updateMessage(id: string, message: Partial<DB_Message>): Promise<any>;
-  updateMessagePlugin(id: string, plugin: ChatPluginPayload): Promise<any>;
-  updateMessagePluginState(id: string, key: string, value: any): Promise<any>;
-  bindMessagesToTopic(topicId: string, messageIds: string[]): Promise<any>;
-
+  updateMessage(id: string, message: Partial<UpdateMessageParams>): Promise<any>;
+  updateMessageTTS(id: string, tts: Partial<ChatTTS> | false): Promise<any>;
+  updateMessageTranslate(id: string, translate: Partial<ChatTranslate> | false): Promise<any>;
+  updateMessagePluginState(id: string, value: Record<string, any>): Promise<any>;
+  updateMessagePluginError(id: string, value: ChatMessagePluginError | null): Promise<any>;
+  updateMessagePluginArguments(id: string, value: string | Record<string, any>): Promise<any>;
   removeMessage(id: string): Promise<any>;
-  removeMessages(assistantId: string, topicId?: string): Promise<any>;
+  removeMessages(ids: string[]): Promise<any>;
+  removeMessagesByAssistant(assistantId: string, topicId?: string): Promise<any>;
   removeAllMessages(): Promise<any>;
-
-  hasMessages(): Promise<boolean>;
   messageCountToCheckTrace(): Promise<boolean>;
+  hasMessages(): Promise<boolean>;
 }

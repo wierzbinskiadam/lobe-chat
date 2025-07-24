@@ -1,90 +1,199 @@
-import { Mock, beforeEach, describe, expect, it, vi } from 'vitest';
+import { eq } from 'drizzle-orm';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-import { FileModel } from '@/database/client/models/file';
-import { DB_File } from '@/database/client/schemas/files';
+import { clientDB, initializeDB } from '@/database/client/db';
+import { files, globalFiles, users } from '@/database/schemas';
+import { clientS3Storage } from '@/services/file/ClientS3';
+import { UploadFileParams } from '@/types/files';
 
 import { ClientService } from './client';
 
-const fileService = new ClientService();
+const userId = 'file-user';
 
-// Mocks for the FileModel
-vi.mock('@/database/client/models/file', () => ({
-  FileModel: {
-    create: vi.fn(),
-    delete: vi.fn(),
-    findById: vi.fn(),
-  },
-}));
+const fileService = new ClientService(userId);
 
-// Mocks for the URL and Blob objects
-global.URL.createObjectURL = vi.fn();
-global.Blob = vi.fn();
+const mockFile = {
+  name: 'mock.png',
+  fileType: 'image/png',
+  size: 1,
+  url: '',
+};
+
+beforeEach(async () => {
+  await initializeDB();
+
+  await clientDB.delete(users);
+  await clientDB.delete(globalFiles);
+  // 创建测试数据
+  await clientDB.transaction(async (tx) => {
+    await tx.insert(users).values({ id: userId });
+  });
+});
 
 describe('FileService', () => {
-  beforeEach(() => {
-    // Reset all mocks before each test
-    vi.resetAllMocks();
-  });
+  describe('createFile', () => {
+    it('createFile should save the file to the database', async () => {
+      const localFile: UploadFileParams = {
+        name: 'test',
+        fileType: 'image/png',
+        url: '',
+        size: 1,
+        hash: '123',
+      };
 
-  it('uploadFile should save the file to the database', async () => {
-    const localFile: DB_File = {
-      name: 'test',
-      data: new ArrayBuffer(1),
-      fileType: 'image/png',
-      saveMode: 'local',
-      size: 1,
-    };
+      await clientS3Storage.putObject(
+        '123',
+        new File([new ArrayBuffer(1)], 'test.png', { type: 'image/png' }),
+      );
 
-    (FileModel.create as Mock).mockResolvedValue(localFile);
+      const result = await fileService.createFile(localFile);
 
-    const result = await fileService.uploadFile(localFile);
+      expect(result).toMatchObject({ url: 'data:image/png;base64,AA==' });
+    });
 
-    expect(FileModel.create).toHaveBeenCalledWith(localFile);
-    expect(result).toEqual(localFile);
+    it('should throw error when file is not found in storage during base64 conversion', async () => {
+      const localFile: UploadFileParams = {
+        name: 'test',
+        fileType: 'image/png',
+        url: '',
+        size: 1,
+        hash: 'non-existing-hash',
+      };
+
+      // 不调用 clientS3Storage.putObject，模拟文件不存在的情况
+
+      const promise = fileService.createFile(localFile);
+
+      await expect(promise).rejects.toThrow('file not found');
+    });
   });
 
   it('removeFile should delete the file from the database', async () => {
     const fileId = '1';
-    (FileModel.delete as Mock).mockResolvedValue(true);
+    await clientDB.insert(files).values({ id: fileId, userId, ...mockFile });
 
-    const result = await fileService.removeFile(fileId);
+    await fileService.removeFile(fileId);
 
-    expect(FileModel.delete).toHaveBeenCalledWith(fileId);
-    expect(result).toBe(true);
+    const result = await clientDB.query.files.findFirst({
+      where: eq(files.id, fileId),
+    });
+
+    expect(result).toBeUndefined();
   });
 
-  it('getFile should retrieve and convert file info to FilePreview', async () => {
-    const fileId = '1';
-    const fileData: DB_File = {
-      name: 'test',
-      data: new ArrayBuffer(1),
-      fileType: 'image/png',
-      saveMode: 'local',
-      size: 1,
-    };
+  describe('getFile', () => {
+    it('should retrieve and convert local file info to FilePreview', async () => {
+      const fileId = 'rwlijweled';
+      const file = {
+        fileType: 'image/png',
+        size: 1,
+        name: 'test.png',
+        url: 'idb://12312/abc.png',
+        hashId: '123tttt',
+      };
 
-    (FileModel.findById as Mock).mockResolvedValue(fileData);
-    (global.URL.createObjectURL as Mock).mockReturnValue('blob:test');
-    (global.Blob as Mock).mockImplementation(() => ['test']);
+      await clientDB.insert(globalFiles).values({ ...file, creator: userId });
 
-    const result = await fileService.getFile(fileId);
+      await clientDB.insert(files).values({
+        id: fileId,
+        userId,
+        ...file,
+        createdAt: new Date(1),
+        updatedAt: new Date(2),
+        fileHash: file.hashId,
+      });
 
-    expect(FileModel.findById).toHaveBeenCalledWith(fileId);
-    expect(result).toEqual({
-      base64Url: 'data:image/png;base64,AA==',
-      fileType: 'image/png',
-      name: 'test',
-      saveMode: 'local',
-      url: 'blob:test',
+      await clientS3Storage.putObject(
+        file.hashId,
+        new File([new ArrayBuffer(1)], file.name, { type: file.fileType }),
+      );
+
+      const result = await fileService.getFile(fileId);
+
+      expect(result).toMatchObject({
+        createdAt: new Date(1),
+        id: 'rwlijweled',
+        size: 1,
+        type: 'image/png',
+        name: 'test.png',
+        updatedAt: new Date(2),
+      });
+    });
+
+    it('should throw an error when the file is not found', async () => {
+      const fileId = 'non-existent';
+
+      const getFilePromise = fileService.getFile(fileId);
+
+      await expect(getFilePromise).rejects.toThrow('file not found');
     });
   });
 
-  it('getFile should throw an error when the file is not found', async () => {
-    const fileId = 'non-existent';
-    (FileModel.findById as Mock).mockResolvedValue(null);
+  describe('removeFiles', () => {
+    it('should delete multiple files from the database', async () => {
+      const fileIds = ['1', '2', '3'];
 
-    const getFilePromise = fileService.getFile(fileId);
+      // 插入测试文件数据
+      await Promise.all(
+        fileIds.map((id) => clientDB.insert(files).values({ id, userId, ...mockFile })),
+      );
 
-    await expect(getFilePromise).rejects.toThrow('file not found');
+      await fileService.removeFiles(fileIds);
+
+      // 验证所有文件都被删除
+      const remainingFiles = await clientDB.query.files.findMany({
+        where: (fields, { inArray }) => inArray(fields.id, fileIds),
+      });
+
+      expect(remainingFiles).toHaveLength(0);
+    });
+  });
+
+  describe('removeAllFiles', () => {
+    it('should clear all files for the user', async () => {
+      // 插入测试文件数据
+      await Promise.all([
+        clientDB.insert(files).values({ id: '1', userId, ...mockFile }),
+        clientDB.insert(files).values({ id: '2', userId, ...mockFile }),
+      ]);
+
+      await fileService.removeAllFiles();
+
+      // 验证用户的所有文件都被删除
+      const remainingFiles = await clientDB.query.files.findMany({
+        where: eq(files.userId, userId),
+      });
+
+      expect(remainingFiles).toHaveLength(0);
+    });
+  });
+
+  describe('checkFileHash', () => {
+    it('should return true if file hash exists', async () => {
+      const hash = 'existing-hash';
+      await clientDB.insert(globalFiles).values({
+        ...mockFile,
+        hashId: hash,
+        creator: userId,
+      });
+      await clientDB.insert(files).values({
+        id: '1',
+        userId,
+        ...mockFile,
+        fileHash: hash,
+      });
+
+      const exists = await fileService.checkFileHash(hash);
+
+      expect(exists).toMatchObject({ isExist: true });
+    });
+
+    it('should return false if file hash does not exist', async () => {
+      const hash = 'non-existing-hash';
+
+      const exists = await fileService.checkFileHash(hash);
+
+      expect(exists).toEqual({ isExist: false });
+    });
   });
 });

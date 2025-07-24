@@ -1,18 +1,31 @@
 import Authentik from 'next-auth/providers/authentik';
 
-import { getServerConfig } from '@/config/server';
+import { authEnv } from '@/config/auth';
 
-const { AUTHENTIK_CLIENT_ID, AUTHENTIK_CLIENT_SECRET, AUTHENTIK_ISSUER } = getServerConfig();
+import { CommonProviderConfig } from './sso.config';
 
 const provider = {
   id: 'authentik',
   provider: Authentik({
+    ...CommonProviderConfig,
     // Specify auth scope, at least include 'openid email'
     // all scopes in Authentik ref: https://goauthentik.io/docs/providers/oauth2
     authorization: { params: { scope: 'openid email profile' } },
-    clientId: AUTHENTIK_CLIENT_ID,
-    clientSecret: AUTHENTIK_CLIENT_SECRET,
-    issuer: AUTHENTIK_ISSUER,
+    // TODO(NextAuth ENVs Migration): Remove once nextauth envs migration time end
+    clientId: authEnv.AUTHENTIK_CLIENT_ID ?? process.env.AUTH_AUTHENTIK_ID,
+    clientSecret: authEnv.AUTHENTIK_CLIENT_SECRET ?? process.env.AUTH_AUTHENTIK_SECRET,
+    issuer: authEnv.AUTHENTIK_ISSUER ?? process.env.AUTH_AUTHENTIK_ISSUER,
+    // Remove end
+    // TODO(NextAuth): map unique user id to `providerAccountId` field
+    //  profile(profile) {
+    //   return {
+    //     email: profile.email,
+    //     image: profile.picture,
+    //     name: profile.name,
+    //     providerAccountId: profile.user_id,
+    //     id: profile.user_id,
+    //   };
+    // },
   }),
 };
 

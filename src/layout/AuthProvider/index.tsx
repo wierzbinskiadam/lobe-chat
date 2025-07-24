@@ -1,12 +1,17 @@
 import { PropsWithChildren } from 'react';
 
-import { getServerConfig } from '@/config/server';
+import { authEnv } from '@/config/auth';
 
+import Clerk from './Clerk';
 import NextAuth from './NextAuth';
+import NoAuth from './NoAuth';
 
-const { ENABLE_OAUTH_SSO = false } = getServerConfig();
+const AuthProvider = ({ children }: PropsWithChildren) => {
+  if (authEnv.NEXT_PUBLIC_ENABLE_CLERK_AUTH) return <Clerk>{children}</Clerk>;
 
-const AuthProvider = ({ children }: PropsWithChildren) =>
-  ENABLE_OAUTH_SSO ? <NextAuth>{children}</NextAuth> : children;
+  if (authEnv.NEXT_PUBLIC_ENABLE_NEXT_AUTH) return <NextAuth>{children}</NextAuth>;
+
+  return <NoAuth>{children}</NoAuth>;
+};
 
 export default AuthProvider;

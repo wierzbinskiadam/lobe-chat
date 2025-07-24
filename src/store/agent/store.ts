@@ -1,16 +1,14 @@
-import { devtools } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 import { StateCreator } from 'zustand/vanilla';
 
-import { isDev } from '@/utils/env';
-
-import { SessionStoreState, initialState } from './initialState';
+import { createDevtools } from '../middleware/createDevtools';
+import { AgentStoreState, initialState } from './initialState';
 import { AgentChatAction, createChatSlice } from './slices/chat/action';
 
 //  ===============  aggregate createStoreFn ============ //
 
-export interface AgentStore extends AgentChatAction, SessionStoreState {}
+export interface AgentStore extends AgentChatAction, AgentStoreState {}
 
 const createStore: StateCreator<AgentStore, [['zustand/devtools', never]]> = (...parameters) => ({
   ...initialState,
@@ -19,9 +17,8 @@ const createStore: StateCreator<AgentStore, [['zustand/devtools', never]]> = (..
 
 //  ===============  implement useStore ============ //
 
-export const useAgentStore = createWithEqualityFn<AgentStore>()(
-  devtools(createStore, {
-    name: 'LobeChat_Agent' + (isDev ? '_DEV' : ''),
-  }),
-  shallow,
-);
+const devtools = createDevtools('agent');
+
+export const useAgentStore = createWithEqualityFn<AgentStore>()(devtools(createStore), shallow);
+
+export const getAgentStoreState = () => useAgentStore.getState();

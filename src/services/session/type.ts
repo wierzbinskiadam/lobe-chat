@@ -1,36 +1,61 @@
 /* eslint-disable typescript-sort-keys/interface */
-import { DeepPartial } from 'utility-types';
+import type { PartialDeep } from 'type-fest';
 
-import { LobeAgentConfig } from '@/types/agent';
+import { LobeAgentChatConfig, LobeAgentConfig } from '@/types/agent';
+import { MetaData } from '@/types/meta';
 import { BatchTaskResult } from '@/types/service';
 import {
   ChatSessionList,
   LobeAgentSession,
   LobeSessionType,
   LobeSessions,
-  SessionGroupId,
   SessionGroupItem,
   SessionGroups,
+  SessionRankItem,
+  UpdateSessionParams,
 } from '@/types/session';
 
 export interface ISessionService {
+  hasSessions(): Promise<boolean>;
   createSession(type: LobeSessionType, defaultValue: Partial<LobeAgentSession>): Promise<string>;
+
+  /**
+   * 需要废弃
+   * @deprecated
+   */
   batchCreateSessions(importSessions: LobeSessions): Promise<any>;
   cloneSession(id: string, newTitle: string): Promise<string | undefined>;
 
   getGroupedSessions(): Promise<ChatSessionList>;
-  getSessionsByType(type: 'agent' | 'group' | 'all'): Promise<LobeSessions>;
-  countSessions(): Promise<number>;
-  hasSessions(): Promise<boolean>;
+
+  /**
+   * @deprecated
+   */
+  getSessionsByType(type?: 'agent' | 'group' | 'all'): Promise<LobeSessions>;
+  countSessions(params?: {
+    endDate?: string;
+    range?: [string, string];
+    startDate?: string;
+  }): Promise<number>;
+  rankSessions(limit?: number): Promise<SessionRankItem[]>;
   searchSessions(keyword: string): Promise<LobeSessions>;
 
-  updateSession(
-    id: string,
-    data: Partial<{ group?: SessionGroupId; pinned?: boolean }>,
-  ): Promise<any>;
+  updateSession(id: string, data: Partial<UpdateSessionParams>): Promise<any>;
 
   getSessionConfig(id: string): Promise<LobeAgentConfig>;
-  updateSessionConfig(id: string, config: DeepPartial<LobeAgentConfig>): Promise<any>;
+  updateSessionConfig(
+    id: string,
+    config: PartialDeep<LobeAgentConfig>,
+    signal?: AbortSignal,
+  ): Promise<any>;
+
+  updateSessionMeta(id: string, meta: Partial<MetaData>, signal?: AbortSignal): Promise<any>;
+
+  updateSessionChatConfig(
+    id: string,
+    config: Partial<LobeAgentChatConfig>,
+    signal?: AbortSignal,
+  ): Promise<any>;
 
   removeSession(id: string): Promise<any>;
   removeAllSessions(): Promise<any>;
@@ -40,6 +65,11 @@ export interface ISessionService {
   // ************************************** //
 
   createSessionGroup(name: string, sort?: number): Promise<string>;
+
+  /**
+   * 需要废弃
+   * @deprecated
+   */
   batchCreateSessionGroups(groups: SessionGroups): Promise<BatchTaskResult>;
 
   getSessionGroups(): Promise<SessionGroupItem[]>;

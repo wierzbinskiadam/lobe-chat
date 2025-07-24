@@ -1,44 +1,45 @@
-import { LobeChatPluginManifest } from '@lobehub/chat-plugin-sdk';
-
-import { PluginModel } from '@/database/client/models/plugin';
+import { clientDB } from '@/database/client/db';
+import { PluginModel } from '@/database/models/plugin';
+import { BaseClientService } from '@/services/baseClientService';
 import { LobeTool } from '@/types/tool';
-import { LobeToolCustomPlugin } from '@/types/tool/plugin';
 
-export interface InstallPluginParams {
-  identifier: string;
-  manifest: LobeChatPluginManifest;
-  type: 'plugin' | 'customPlugin';
-}
+import { IPluginService } from './type';
 
-export class ClientService {
-  installPlugin = async (plugin: InstallPluginParams) => {
-    return PluginModel.create(plugin);
+export class ClientService extends BaseClientService implements IPluginService {
+  private get pluginModel(): PluginModel {
+    return new PluginModel(clientDB as any, this.userId);
+  }
+
+  installPlugin: IPluginService['installPlugin'] = async (plugin) => {
+    await this.pluginModel.create(plugin);
   };
 
-  getInstalledPlugins = () => {
-    return PluginModel.getList() as Promise<LobeTool[]>;
+  getInstalledPlugins: IPluginService['getInstalledPlugins'] = () => {
+    return this.pluginModel.query() as Promise<LobeTool[]>;
   };
 
-  uninstallPlugin(identifier: string) {
-    return PluginModel.delete(identifier);
-  }
+  uninstallPlugin: IPluginService['uninstallPlugin'] = async (identifier) => {
+    await this.pluginModel.delete(identifier);
+  };
 
-  async createCustomPlugin(customPlugin: LobeToolCustomPlugin) {
-    return PluginModel.create({ ...customPlugin, type: 'customPlugin' });
-  }
+  createCustomPlugin: IPluginService['createCustomPlugin'] = async (customPlugin) => {
+    await this.pluginModel.create({ ...customPlugin, type: 'customPlugin' });
+  };
 
-  async updatePlugin(id: string, value: LobeToolCustomPlugin) {
-    return PluginModel.update(id, value);
-  }
-  async updatePluginManifest(id: string, manifest: LobeChatPluginManifest) {
-    return PluginModel.update(id, { manifest });
-  }
+  updatePlugin: IPluginService['updatePlugin'] = async (id, value) => {
+    await this.pluginModel.update(id, value);
+  };
 
-  async removeAllPlugins() {
-    return PluginModel.clear();
-  }
+  updatePluginManifest: IPluginService['updatePluginManifest'] = async (id, manifest) => {
+    await this.pluginModel.update(id, { manifest });
+  };
 
-  async updatePluginSettings(id: string, settings: any) {
-    return PluginModel.update(id, { settings });
-  }
+  removeAllPlugins: IPluginService['removeAllPlugins'] = async () => {
+    await this.pluginModel.deleteAll();
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  updatePluginSettings: IPluginService['updatePluginSettings'] = async (id, settings, _?) => {
+    await this.pluginModel.update(id, { settings });
+  };
 }

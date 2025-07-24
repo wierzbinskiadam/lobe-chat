@@ -1,5 +1,5 @@
-import { ActionIcon, Avatar, Icon } from '@lobehub/ui';
-import { Divider, Popover, Switch, Tag, Typography } from 'antd';
+import { ActionIcon, Avatar, Icon, Tag, Text } from '@lobehub/ui';
+import { Divider, Popover, Switch } from 'antd';
 import { createStyles } from 'antd-style';
 import { TooltipPlacement } from 'antd/es/tooltip';
 import isEqual from 'fast-deep-equal';
@@ -9,13 +9,11 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
-import { useGlobalStore } from '@/store/global';
-import { syncSettingsSelectors } from '@/store/global/selectors';
+import { useUserStore } from '@/store/user';
+import { syncSettingsSelectors } from '@/store/user/selectors';
 import { pathString } from '@/utils/url';
 
 import EnableTag from './EnableTag';
-
-const { Text } = Typography;
 
 const useStyles = createStyles(({ css, token, prefixCls }) => ({
   text: css`
@@ -39,7 +37,7 @@ const EnableSync = memo<EnableSyncProps>(({ hiddenActions, placement = 'bottomLe
   const { t } = useTranslation('common');
 
   const { styles, theme } = useStyles();
-  const [syncStatus, isSyncing, channelName, enableWebRTC, setSettings] = useGlobalStore((s) => [
+  const [syncStatus, isSyncing, channelName, enableWebRTC, setSettings] = useUserStore((s) => [
     s.syncStatus,
     s.syncStatus === 'syncing',
     syncSettingsSelectors.webrtcChannelName(s),
@@ -47,7 +45,7 @@ const EnableSync = memo<EnableSyncProps>(({ hiddenActions, placement = 'bottomLe
     s.setSettings,
   ]);
 
-  const users = useGlobalStore((s) => s.syncAwareness, isEqual);
+  const users = useUserStore((s) => s.syncAwareness, isEqual);
 
   const switchSync = (enabled: boolean) => {
     setSettings({ sync: { webrtc: { enabled } } });
@@ -67,9 +65,7 @@ const EnableSync = memo<EnableSyncProps>(({ hiddenActions, placement = 'bottomLe
               style={{ paddingInlineEnd: 12 }}
             >
               {t('sync.channel')}
-              <Text className={styles.text} copyable>
-                {channelName}
-              </Text>
+              <Text className={styles.text}>{channelName}</Text>
             </Flexbox>
           </Flexbox>
           <Divider dashed style={{ margin: 0 }} />
@@ -81,7 +77,7 @@ const EnableSync = memo<EnableSyncProps>(({ hiddenActions, placement = 'bottomLe
                     <Icon
                       color={theme.purple}
                       icon={user.isMobile ? LucideSmartphone : LucideLaptop}
-                      size={{ fontSize: 24 }}
+                      size={24}
                     />
                   }
                   background={theme.purple1}
@@ -99,9 +95,9 @@ const EnableSync = memo<EnableSyncProps>(({ hiddenActions, placement = 'bottomLe
                       </Flexbox>
                     )}
                   </Flexbox>
-                  <Typography.Text type={'secondary'}>
+                  <Text type={'secondary'}>
                     {user.os} · {user.browser}
-                  </Typography.Text>
+                  </Text>
                 </Flexbox>
               </Flexbox>
             ))}

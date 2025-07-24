@@ -1,14 +1,27 @@
+import type { PartialDeep } from 'type-fest';
+
 import { DEFAULT_AGENT_CONFIG } from '@/const/settings';
+import { AgentSettingsInstance } from '@/features/AgentSetting';
 import { LobeAgentConfig } from '@/types/agent';
 
 export interface AgentState {
+  activeAgentId?: string;
   activeId: string;
-  agentConfig: LobeAgentConfig;
-  isAgentConfigInit: boolean;
+  agentConfigInitMap: Record<string, boolean>;
+  agentMap: Record<string, PartialDeep<LobeAgentConfig>>;
+  agentSettingInstance?: AgentSettingsInstance | null;
+  defaultAgentConfig: LobeAgentConfig;
+  isInboxAgentConfigInit: boolean;
+  showAgentSetting: boolean;
+  updateAgentChatConfigSignal?: AbortController;
+  updateAgentConfigSignal?: AbortController;
 }
 
-export const initialSessionState: AgentState = {
+export const initialAgentChatState: AgentState = {
   activeId: 'inbox',
-  agentConfig: DEFAULT_AGENT_CONFIG,
-  isAgentConfigInit: false,
+  agentConfigInitMap: {},
+  agentMap: {},
+  defaultAgentConfig: DEFAULT_AGENT_CONFIG,
+  isInboxAgentConfigInit: false,
+  showAgentSetting: false,
 };

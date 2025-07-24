@@ -11,6 +11,7 @@
 venv
 temp
 tmp
+.windsurfrules
 
 # dependencies
 node_modules
@@ -42,6 +43,7 @@ test-output
 
 # misc
 # add other ignore file below
+CLAUDE.md
 
 # local env files
 .env*.local
@@ -55,8 +57,22 @@ next-env.d.ts
 .next
 .env
 public/*.js
+public/sitemap.xml
+public/sitemap-index.xml
 bun.lockb
 sitemap*.xml
 robots.txt
 
+# Serwist
+public/sw*
+public/swe-worker*
+
 *.patch
+*.pdf
+vertex-ai-key.json
+.pnpm-store
+./packages/lobe-ui
+
+
+# for local prd docs
+docs/prd

@@ -1,7 +1,12 @@
-import { DeepPartial } from 'utility-types';
+import type { PartialDeep } from 'type-fest';
 
+import { IFeatureFlags } from '@/config/featureFlags';
 import { ChatModelCard } from '@/types/llm';
-import { GlobalDefaultAgent, GlobalLLMProviderKey } from '@/types/settings';
+import {
+  GlobalLLMProviderKey,
+  UserDefaultAgent,
+  UserSystemAgentConfig,
+} from '@/types/user/settings';
 
 export interface ServerModelProviderConfig {
   enabled?: boolean;
@@ -13,11 +18,29 @@ export interface ServerModelProviderConfig {
   serverModelCards?: ChatModelCard[];
 }
 
+export type ServerLanguageModel = Partial<Record<GlobalLLMProviderKey, ServerModelProviderConfig>>;
+
 export interface GlobalServerConfig {
-  defaultAgent?: DeepPartial<GlobalDefaultAgent>;
+  aiProvider: ServerLanguageModel;
+  defaultAgent?: PartialDeep<UserDefaultAgent>;
+  enableUploadFileToServer?: boolean;
+  enabledAccessCode?: boolean;
+  /**
+   * @deprecated
+   */
   enabledOAuthSSO?: boolean;
-  languageModel?: Partial<Record<GlobalLLMProviderKey, ServerModelProviderConfig>>;
+  /**
+   * @deprecated
+   */
+  languageModel?: ServerLanguageModel;
+  oAuthSSOProviders?: string[];
+  systemAgent?: PartialDeep<UserSystemAgentConfig>;
   telemetry: {
     langfuse?: boolean;
   };
+}
+
+export interface GlobalRuntimeConfig {
+  serverConfig: GlobalServerConfig;
+  serverFeatureFlags: IFeatureFlags;
 }

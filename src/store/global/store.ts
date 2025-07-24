@@ -1,33 +1,36 @@
-import { devtools, subscribeWithSelector } from 'zustand/middleware';
+import { subscribeWithSelector } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 import { StateCreator } from 'zustand/vanilla';
 
-import { isDev } from '@/utils/env';
-
+import { createDevtools } from '../middleware/createDevtools';
+import { type GlobalClientDBAction, clientDBSlice } from './actions/clientDb';
+import { type GlobalGeneralAction, generalActionSlice } from './actions/general';
+import { type GlobalWorkspacePaneAction, globalWorkspaceSlice } from './actions/workspacePane';
 import { type GlobalState, initialState } from './initialState';
-import { type CommonAction, createCommonSlice } from './slices/common/action';
-import { type PreferenceAction, createPreferenceSlice } from './slices/preference/action';
-import { type SettingsAction, createSettingsSlice } from './slices/settings/actions';
 
 //  ===============  聚合 createStoreFn ============ //
 
-export type GlobalStore = CommonAction & GlobalState & SettingsAction & PreferenceAction;
+export interface GlobalStore
+  extends GlobalState,
+    GlobalWorkspacePaneAction,
+    GlobalClientDBAction,
+    GlobalGeneralAction {
+  /* empty */
+}
 
 const createStore: StateCreator<GlobalStore, [['zustand/devtools', never]]> = (...parameters) => ({
   ...initialState,
-  ...createCommonSlice(...parameters),
-  ...createSettingsSlice(...parameters),
-  ...createPreferenceSlice(...parameters),
+  ...globalWorkspaceSlice(...parameters),
+  ...clientDBSlice(...parameters),
+  ...generalActionSlice(...parameters),
 });
 
 //  ===============  实装 useStore ============ //
 
+const devtools = createDevtools('global');
+
 export const useGlobalStore = createWithEqualityFn<GlobalStore>()(
-  subscribeWithSelector(
-    devtools(createStore, {
-      name: 'LobeChat_Global' + (isDev ? '_DEV' : ''),
-    }),
-  ),
+  subscribeWithSelector(devtools(createStore)),
   shallow,
 );

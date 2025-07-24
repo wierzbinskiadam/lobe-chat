@@ -1,11 +1,13 @@
-/* eslint-disable typescript-sort-keys/interface */
-import { DB_File } from '@/database/client/schemas/files';
-import { FilePreview } from '@/types/files';
+import { CheckFileHashResult, FileItem, UploadFileParams } from '@/types/files';
 
 export interface IFileService {
-  uploadFile(file: DB_File): Promise<any>;
-  uploadImageByUrl(url: string, file: Pick<DB_File, 'name' | 'metadata'>): Promise<any>;
-  removeFile(id: string): Promise<any>;
+  checkFileHash(hash: string): Promise<CheckFileHashResult>;
+  createFile(
+    file: UploadFileParams,
+    knowledgeBaseId?: string,
+  ): Promise<{ id: string; url: string }>;
+  getFile(id: string): Promise<FileItem>;
   removeAllFiles(): Promise<any>;
-  getFile(id: string): Promise<FilePreview>;
+  removeFile(id: string): Promise<void>;
+  removeFiles(ids: string[]): Promise<void>;
 }

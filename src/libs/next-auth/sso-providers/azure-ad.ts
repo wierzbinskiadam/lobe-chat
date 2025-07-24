@@ -1,18 +1,32 @@
 import AzureAD from 'next-auth/providers/azure-ad';
 
-import { getServerConfig } from '@/config/server';
+import { authEnv } from '@/config/auth';
 
-const { AZURE_AD_CLIENT_ID, AZURE_AD_CLIENT_SECRET, AZURE_AD_TENANT_ID } = getServerConfig();
+import { getMicrosoftEntraIdIssuer } from './microsoft-entra-id-helper';
+import { CommonProviderConfig } from './sso.config';
 
 const provider = {
   id: 'azure-ad',
   provider: AzureAD({
+    ...CommonProviderConfig,
     // Specify auth scope, at least include 'openid email'
     // all scopes in Azure AD ref: https://learn.microsoft.com/en-us/entra/identity-platform/scopes-oidc#openid-connect-scopes
     authorization: { params: { scope: 'openid email profile' } },
-    clientId: AZURE_AD_CLIENT_ID,
-    clientSecret: AZURE_AD_CLIENT_SECRET,
-    tenantId: AZURE_AD_TENANT_ID,
+    // TODO(NextAuth ENVs Migration): Remove once nextauth envs migration time end
+    clientId: authEnv.AZURE_AD_CLIENT_ID ?? process.env.AUTH_AZURE_AD_ID,
+    clientSecret: authEnv.AZURE_AD_CLIENT_SECRET ?? process.env.AUTH_AZURE_AD_SECRET,
+    issuer: getMicrosoftEntraIdIssuer(),
+    // Remove end
+    // TODO(NextAuth): map unique user id to `providerAccountId` field
+    // profile(profile) {
+    //   return {
+    //     email: profile.email,
+    //     image: profile.picture,
+    //     name: profile.name,
+    //     providerAccountId: profile.user_id,
+    //     id: profile.user_id,
+    //   };
+    // },
   }),
 };
 
